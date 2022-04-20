@@ -37,6 +37,10 @@ namespace RatingApp
             numericUpDown.Location = point;
             numericUpDown.Width = width;
             numericUpDown.Maximum = max;
+            numericUpDown.MouseWheel += delegate (object sender, MouseEventArgs e)
+            {
+                ((HandledMouseEventArgs)e).Handled = true;
+            };
             return numericUpDown;
         }
 
