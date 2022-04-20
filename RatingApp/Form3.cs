@@ -53,7 +53,7 @@ namespace RatingApp
             var l = ControlFactory.CreateLabel("Players:", new Point(20, 10), 50);
             this.Controls.Add(l);
 
-            var p = ControlFactory.CreateNumericUpDown("players", new Point(70, 10), 30, 5);
+            var p = ControlFactory.CreateNumericUpDown("players", new Point(70, 10), 30, 7);
             p.Minimum = 2;
             p.ValueChanged += players_ValueChanged;
             this.Controls.Add(p);
@@ -92,8 +92,9 @@ namespace RatingApp
                 this.Controls.Remove(control);
             }
 
-            Panel matches = ControlFactory.CreatePanel("matches", new Point(200, 50), 400);
-            matches.Width = 300;
+            Panel matches = ControlFactory.CreatePanel("matches", new Point(200, 40), 350);
+            matches.Width = 250;
+            matches.BorderStyle = BorderStyle.FixedSingle;
             matches.AutoScroll = true;
 
             var players = (NumericUpDown)this.Controls.Find("players", true).First();
@@ -105,8 +106,16 @@ namespace RatingApp
                 var t = ControlFactory.CreateTextBox("tb_player_" + (i + 1), new Point(80, i * 30 + 50), 35, defaultText: "0");
                 t.TextChanged += T_TextChanged;
                 t.KeyPress += T_KeyPressed;
-                
-                var r = ControlFactory.CreateTextBox("r_player_" + (i + 1), new Point(500, i * 30 + 50), 35, true, "0");
+                t.LostFocus += delegate(object sender, EventArgs e)
+                {
+                    var control = (TextBox)sender;
+                    if (string.IsNullOrEmpty(control.Text))
+                    {
+                        control.Text = "0";
+                    }
+                };
+
+                var r = ControlFactory.CreateTextBox("r_player_" + (i + 1), new Point(120, i * 30 + 50), 35, true, "0");
 
                 ToBeRemoved.Add(l);
                 ToBeRemoved.Add(t);
@@ -133,6 +142,12 @@ namespace RatingApp
                 case 5:
                     schema = SchemaFactory.FivePlayers;
                     break;
+                case 6:
+                    schema = SchemaFactory.SixPlayers;
+                    break;
+                case 7:
+                    schema = SchemaFactory.SevenPlayers;
+                    break;
                 default:
                     break;
             }
@@ -141,12 +156,12 @@ namespace RatingApp
 
             foreach (var round in schema.Rounds)
             {
-                var l2 = ControlFactory.CreateLabel((round.Index + 1).ToString() + ":", new Point(10, index * 30 + 25 * round.Index), 20);
+                var l2 = ControlFactory.CreateLabel((round.Index + 1).ToString() + ":", new Point(10, index * 30 + 25 * round.Index + 10), 20);
                 matches.Controls.Add(l2);
 
                 foreach (var match in round.Matches)
                 {
-                    var l = ControlFactory.CreateLabel((index + 1) + ": " + match.player_1_index + "-" + match.player_2_index, new Point(50, index * 30 + 25 * round.Index), 50);
+                    var l = ControlFactory.CreateLabel((index + 1) + ": " + match.player_1_index + "-" + match.player_2_index, new Point(50, index * 30 + 25 * round.Index + 10), 50);
 
 
                     var n1 = ControlFactory.CreateNumericUpDown("player_" + match.player_1_index + "_match_" + (index + 1), new Point(0, 0), 40, 3);
@@ -155,7 +170,8 @@ namespace RatingApp
                     var n2 = ControlFactory.CreateNumericUpDown("player_" + match.player_2_index + "_match_" + (index + 1), new Point(50, 0), 40, 3);
                     n2.ValueChanged += N_ValueChanged;
 
-                    Panel g = ControlFactory.CreatePanel("group_" + (index + 1), new Point(100, index * 30 + 25 * round.Index), 20);
+                    Panel g = ControlFactory.CreatePanel("group_" + (index + 1), new Point(100, index * 30 + 25 * round.Index + 10), 20);
+                    g.Width = 100;
 
                     g.Controls.Add(n1);
                     g.Controls.Add(n2);
@@ -189,12 +205,7 @@ namespace RatingApp
 
             var player_1 = (TextBox)this.Controls.Find("r_player_" + splits[2], true).FirstOrDefault();
             if(player_1 != null)
-                player_1.Text = control.Text;
-
-            if (string.IsNullOrEmpty(control.Text))
-            {
-                control.Text = "0";
-            }
+                player_1.Text = control.Text;  
         }
 
         private void ResetResults()
